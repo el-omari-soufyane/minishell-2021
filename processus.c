@@ -78,25 +78,29 @@ int set_env(process_t* proc) {
  */
 int launch_cmd(process_t* proc) {
     assert(proc!=NULL);
-    int status;
-    int saved_stdout, saved_stderr;
+    int tmp_stdout, tmp_stderr;
     do{
-        saved_stdout = dup(1);
-        saved_stderr = dup(2);
-        status = 0;
+        tmp_stdout = dup(1);
+        tmp_stderr = dup(2);
+        
+        proc->status = 0;
+        
         pipe(proc->fdclose);
         proc->pid = fork();
         if(proc->pid  == 0) {
             if(proc->bg == 1) {
+                // S'il s'agit d'une commande Pipe
                 close(proc->fdclose[0]);
                 dup2(proc->fdclose[1], 1);
                 close(proc->fdclose[1]);
             }
             if(proc->stdout != 0) {
+                // S'il s'agit d'une commande > ou >>
                 dup2(proc->stdout, 1);
                 close(proc->stdout);
             }
             if(proc->stderr != 0) {
+                // S'il s'agit d'une commande 2> ou 2>>
                 dup2(proc->stderr, 2);
                 close(proc->stderr);
             }
@@ -104,7 +108,7 @@ int launch_cmd(process_t* proc) {
             perror(*proc->argv);
             exit(1);
         } else {
-            wait(&status);
+            wait(&proc->status);
             if(proc->bg == 1) {
                 close(proc->fdclose[1]);
                 dup2(proc->fdclose[0], 0);
@@ -112,7 +116,7 @@ int launch_cmd(process_t* proc) {
                 proc++;
                 execvp(*proc->argv, proc->argv);
                 perror("pipe");
-                exit(1);
+                return -1;
             }
             if(proc->stdout != 0) {
                 close(proc->stdout);
@@ -120,10 +124,11 @@ int launch_cmd(process_t* proc) {
             if(proc->stderr != 0) {
                 close(proc->stderr);
             }
-            dup2(saved_stdout, 1);
-            close(saved_stdout);
-            dup2(saved_stderr, 2);
-            close(saved_stderr);
+            // Revenir à l'état standard des sorties standard et erreurs
+            dup2(tmp_stdout, 1);
+            close(tmp_stdout);
+            dup2(tmp_stderr, 2);
+            close(tmp_stderr);
             proc++;
         }
     }while(proc->next != NULL);
