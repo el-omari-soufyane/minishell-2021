@@ -155,10 +155,11 @@ int launch_cmd(process_t *proc)
             proc->pid = fork();
             if (proc->pid == 0)
             {
-                close(proc->fdclose[0]);
-                dup2(proc->fdclose[1], 1);
-                close(proc->fdclose[1]);
-                
+                if(proc->stdin > 0 && proc->stdout > 1) {
+                    close(proc->fdclose[0]);
+                    dup2(proc->fdclose[1], 1);
+                    close(proc->fdclose[1]);
+                }
                 if (proc->stdin > 0)
                 {
                     // S'il s'agit d'une commande > ou >>
