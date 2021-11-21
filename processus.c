@@ -53,7 +53,6 @@ int check_zero(void *ptr, size_t size)
 int init_process(process_t *proc)
 {
     assert(proc != NULL);
-    assert(check_zero(proc, sizeof(*proc)) == 0);
     do
     {
         proc->path = NULL;
@@ -66,6 +65,8 @@ int init_process(process_t *proc)
         proc->next_failure = NULL;
         proc = proc->next;
     } while (proc != NULL);
+    assert(check_zero(proc, sizeof(*proc)) == 0);
+    return 0;
 }
 
 /*
