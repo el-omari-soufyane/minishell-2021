@@ -246,8 +246,6 @@ int parse_cmd(char *tokens[], process_t *commands)
     }
     if (strcmp(tokens[i], "|") == 0)
     {
-      commands[commandNumber].bg = 1;
-
       pipe(commands[commandNumber].fdclose);
       commands[commandNumber].stdout = commands[commandNumber].fdclose[1];
       commands[commandNumber + 1].stdin = commands[commandNumber].fdclose[0];

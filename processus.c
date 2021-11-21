@@ -155,13 +155,10 @@ int launch_cmd(process_t *proc)
             proc->pid = fork();
             if (proc->pid == 0)
             {
-                if (proc->bg == 1)
-                {
-                    // S'il s'agit d'une commande Pipe
-                    close(proc->fdclose[0]);
-                    dup2(proc->fdclose[1], 1);
-                    close(proc->fdclose[1]);
-                }
+                close(proc->fdclose[0]);
+                dup2(proc->fdclose[1], 1);
+                close(proc->fdclose[1]);
+                
                 if (proc->stdin > 0)
                 {
                     // S'il s'agit d'une commande > ou >>
@@ -188,7 +185,7 @@ int launch_cmd(process_t *proc)
             else
             {
                 wait(&proc->status);
-                if (proc->bg == 1)
+                if (proc->fdclose[0] == proc->stdin)
                 {
                     close(proc->fdclose[1]);
                     dup2(proc->fdclose[0], 0);
