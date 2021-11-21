@@ -184,7 +184,7 @@ int launch_cmd(process_t *proc)
             }
             else
             {
-                if (proc->fdclose[0] == proc->stdin)
+                if(proc->stdin > 0 && proc->stdout > 1)
                 {
                     close(proc->fdclose[1]);
                     dup2(proc->fdclose[0], 0);
