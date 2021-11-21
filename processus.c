@@ -64,7 +64,7 @@ int init_process(process_t *proc)
         proc->next = NULL;
         proc->next_success = NULL;
         proc->next_failure = NULL;
-        proc++;
+        proc = proc->next;
     } while (proc != NULL);
 }
 
