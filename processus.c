@@ -79,7 +79,6 @@ int init_process(process_t *proc)
 int set_env(process_t *proc)
 {
     assert(proc != NULL);
-
 }
 
 /*
@@ -102,64 +101,82 @@ int set_env(process_t *proc)
  */
 int launch_cmd(process_t *proc)
 {
-        assert(proc!=NULL);
+    assert(proc != NULL);
     int tmp_stdin, tmp_stdout, tmp_stderr;
-    
-    do{
+    do
+    {
         tmp_stdin = dup(0);
         tmp_stdout = dup(1);
         tmp_stderr = dup(2);
-        
-        if(is_builtin(proc->argv[0]) == 1) {
+
+        if (is_builtin(proc->argv[0]) == 1)
+        {
             int done = builtin(proc);
-            if(done != 0) {
-                perror(*proc->argv+1);
+            if (done != 0)
+            {
+                perror(*proc->argv + 1);
             }
-            if(proc->next != NULL) {
+            if (proc->next != NULL)
+            {
                 proc = proc->next;
                 continue;
             }
-            
-            if(proc->next_success != NULL) {
-                if(proc->status == 0) {
+
+            if (proc->next_success != NULL)
+            {
+                if (proc->status == 0)
+                {
                     proc = proc->next_success;
                     continue;
-                } else {
+                }
+                else
+                {
                     proc = NULL;
                 }
             }
-            
-            if(proc->next_failure != NULL) {
-                if(proc->status != 0) {
+
+            if (proc->next_failure != NULL)
+            {
+                if (proc->status != 0)
+                {
                     proc = proc->next_failure;
                     continue;
-                } else {
+                }
+                else
+                {
                     proc = NULL;
                 }
             }
             proc = NULL;
-        } else {
+        }
+        else
+        {
             proc->status = 0;
             proc->pid = fork();
-            if(proc->pid  == 0) {
-                if(proc->bg == 1) {
+            if (proc->pid == 0)
+            {
+                if (proc->bg == 1)
+                {
                     // S'il s'agit d'une commande Pipe
                     close(proc->fdclose[0]);
                     dup2(proc->fdclose[1], 1);
                     close(proc->fdclose[1]);
                 }
-                if(proc->stdin > 0) {
+                if (proc->stdin > 0)
+                {
                     // S'il s'agit d'une commande > ou >>
                     dup2(proc->stdin, 0);
                     close(proc->stdin);
                 }
-                if(proc->stdout > 1) {
+                if (proc->stdout > 1)
+                {
                     // S'il s'agit d'une commande > ou >>
                     dup2(proc->stdout, 1);
                     close(proc->stdout);
                     close(proc->stdin);
                 }
-                if(proc->stderr > 2) {
+                if (proc->stderr > 2)
+                {
                     // S'il s'agit d'une commande 2> ou 2>>
                     dup2(proc->stderr, 2);
                     close(proc->stderr);
@@ -167,9 +184,12 @@ int launch_cmd(process_t *proc)
                 execvp(*proc->argv, proc->argv);
                 perror(*proc->argv);
                 return -1;
-            } else {
+            }
+            else
+            {
                 wait(&proc->status);
-                if(proc->bg == 1) {
+                if (proc->bg == 1)
+                {
                     close(proc->fdclose[1]);
                     dup2(proc->fdclose[0], 0);
                     close(proc->fdclose[0]);
@@ -178,13 +198,16 @@ int launch_cmd(process_t *proc)
                     perror("pipe");
                     return -1;
                 }
-                if(proc->stdin > 0) {
+                if (proc->stdin > 0)
+                {
                     close(proc->stdin);
                 }
-                if(proc->stdout > 1) {
+                if (proc->stdout > 1)
+                {
                     close(proc->stdout);
                 }
-                if(proc->stderr > 2) {
+                if (proc->stderr > 2)
+                {
                     close(proc->stderr);
                 }
                 // Revenir à l'état standard des sorties standard et erreurs
@@ -194,33 +217,42 @@ int launch_cmd(process_t *proc)
                 close(tmp_stdout);
                 dup2(tmp_stderr, 2);
                 close(tmp_stderr);
-                
-                if(proc->next != NULL) {
+
+                if (proc->next != NULL)
+                {
                     proc = proc->next;
                     continue;
                 }
-                
-                if(proc->next_success != NULL) {
-                    if(proc->status == 0) {
+
+                if (proc->next_success != NULL)
+                {
+                    if (proc->status == 0)
+                    {
                         proc = proc->next_success;
                         continue;
-                    } else {
+                    }
+                    else
+                    {
                         proc = NULL;
                     }
                 }
-                
-                if(proc->next_failure != NULL) {
-                    if(proc->status != 0) {
+
+                if (proc->next_failure != NULL)
+                {
+                    if (proc->status != 0)
+                    {
                         proc = proc->next_failure;
                         continue;
-                    } else {
+                    }
+                    else
+                    {
                         proc = NULL;
                     }
                 }
-                
+
                 proc = NULL;
             }
         }
-    }while(proc != NULL);
+    } while (proc != NULL);
     return 0;
 }
