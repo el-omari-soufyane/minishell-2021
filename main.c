@@ -35,9 +35,8 @@ int main(int argc, char *argv[])
     // Affichage d'une invite de commande
     printf("mini@shell:%s$ ", path);
     // Lecture d'une ligne de commandes
-    scanf("%[^\n]%*c", line);
-    if (strcmp(line, "") == 0)
-      continue;
+    fgets(line, MAX_LINE_SIZE, stdin);
+    if(strcmp(line, "\n") == 0) continue;
 
     // "Nettoyage" de la ligne de commandes
     trim(line);
