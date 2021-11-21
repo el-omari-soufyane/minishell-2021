@@ -79,6 +79,18 @@ int init_process(process_t *proc)
 int set_env(process_t *proc)
 {
     assert(proc != NULL);
+    int i = 0;
+    while (proc->argv[i] != NULL)
+    {
+        if (proc->argv[i][0] == '$')
+        {
+            char *var = proc->argv[i];
+            memmove(var, var + 1, strlen(var));
+            proc->argv[i] = getenv(var);
+        }
+        i++;
+    }
+    return 0;
 }
 
 /*
@@ -155,7 +167,8 @@ int launch_cmd(process_t *proc)
             proc->pid = fork();
             if (proc->pid == 0)
             {
-                if(proc->stdin > 0 && proc->stdout > 1) {
+                if (proc->stdin > 0 && proc->stdout > 1)
+                {
                     close(proc->fdclose[0]);
                     dup2(proc->fdclose[1], 1);
                     close(proc->fdclose[1]);
@@ -185,7 +198,7 @@ int launch_cmd(process_t *proc)
             }
             else
             {
-                if(proc->stdin > 0 && proc->stdout > 1)
+                if (proc->stdin > 0 && proc->stdout > 1)
                 {
                     close(proc->fdclose[1]);
                     dup2(proc->fdclose[0], 0);

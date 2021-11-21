@@ -1,11 +1,20 @@
 /*
   Projet minishell - Licence 3 Info - PSI 2021
  
-  Nom :
-  Prénom :
-  Num. étudiant :
-  Groupe de projet :
-  Date :
+  Nom : EL OMARI
+  Prénom : Soufyane
+  Num. étudiant : 22113404
+
+  Nom : CHOUKRI
+  Prénom : Marouane
+  Num. étudiant : 
+
+  Nom : DOUMI
+  Prénom : Saloua
+  Num. étudiant : 
+
+  Groupe de projet : 20
+  Date : 21/11/2021
  
   Gestion des commandes internes du minishell (headers).
  
