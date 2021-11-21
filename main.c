@@ -33,10 +33,16 @@ int main(int argc, char *argv[])
     // (r�-)_pInitialiser les variables/structures
     init_process(cmds);
     // Affichage d'une invite de commande
-    printf("mini@shell:%s$ ", path);
+    printf("\033[0;32m");
+    printf("\033[1mmini@shell:");
+
+    printf("\033[0;34m");
+    printf("\033[1m%s$ ", path);
+    printf("\033[0m");
     // Lecture d'une ligne de commandes
     fgets(line, MAX_LINE_SIZE, stdin);
-    if(strcmp(line, "\n") == 0) continue;
+    if (strcmp(line, "\n") == 0)
+      continue;
 
     // "Nettoyage" de la ligne de commandes
     trim(line);

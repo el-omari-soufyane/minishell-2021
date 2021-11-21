@@ -181,7 +181,7 @@ int launch_cmd(process_t *proc)
                 }
                 execvp(*proc->argv, proc->argv);
                 perror(*proc->argv);
-                return -1;
+                exit(1);
             }
             else
             {
@@ -193,7 +193,7 @@ int launch_cmd(process_t *proc)
                     proc++;
                     execvp(*proc->argv, proc->argv);
                     perror("pipe");
-                    return -1;
+                    exit(1);
                 }
                 wait(&proc->status);
                 if (proc->stdin > 0)
