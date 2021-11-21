@@ -122,7 +122,7 @@ int cd(const char *path, int fderr)
     getcwd(new_path, sizeof(new_path));
     return 0;
   }
-  char *message = "Chemin invalide !";
+  char *message = "Chemin invalide !\n";
   write(fderr, message, strlen(message));
   close(fderr);
   return changed;
@@ -147,7 +147,7 @@ int export(const char *var, const char *value, int fderr)
   printf("%s=%s\n", var, getenv(var));
   if (env != 0)
   {
-    char *message = "Erreur d'exportation de variable";
+    char *message = "Erreur d'exportation de variable\n";
     write(fderr, message, strlen(message));
     close(fderr);
   }
@@ -160,7 +160,7 @@ int unset(const char *var, int fderr)
   int varUnset = unsetenv(var);
   if (varUnset != 0)
   {
-    char *message = "Erreur de redéfinition de variable";
+    char *message = "Erreur de redéfinition de variable\n";
     write(fderr, message, strlen(message));
     close(fderr);
   }
