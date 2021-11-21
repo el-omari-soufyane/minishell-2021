@@ -184,7 +184,6 @@ int launch_cmd(process_t *proc)
             }
             else
             {
-                wait(&proc->status);
                 if (proc->fdclose[0] == proc->stdin)
                 {
                     close(proc->fdclose[1]);
@@ -195,6 +194,7 @@ int launch_cmd(process_t *proc)
                     perror("pipe");
                     return -1;
                 }
+                wait(&proc->status);
                 if (proc->stdin > 0)
                 {
                     close(proc->stdin);
