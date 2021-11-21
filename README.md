@@ -15,6 +15,7 @@ Change to the project workspace and execute the Makefile to generate the executa
 ```bash
 cd minishell-2021/
 make
+./minishell-2021
 ```
 
 ## Usage
