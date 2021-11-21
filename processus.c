@@ -65,7 +65,6 @@ int init_process(process_t *proc)
         proc->next_failure = NULL;
         proc = proc->next;
     } while (proc != NULL);
-    assert(check_zero(proc, sizeof(*proc)) == 0);
     return 0;
 }
 
