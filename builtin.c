@@ -152,6 +152,17 @@ int export(const char *var, const char *value, int fderr)
   return env;
 }
 
+int unset(const char *var, int fderr) {
+  assert(var != NULL);
+  int varUnset = unsetenv(var);
+  if(varUnset != 0) {
+      char* message = var;
+      strcat(message, " : Erreur de redéfinition de variable !\n");
+      write(fderr, message, strlen(message));
+      close(fderr);
+  }
+}
+
 /*
   Quitter le minishell
  
