@@ -11,7 +11,6 @@
  
  */
 
-
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,10 +30,19 @@
  Retourne 1 si la chaîne passée désigne une
  commande interne (cd, exit, ...)
  */
-int is_builtin(const char* cmd) {
-  assert(cmd!=NULL);
-  
-  
+int is_builtin(const char *cmd)
+{
+  assert(cmd != NULL);
+  char *builtin_list[] = {"cd", "export", "unset", "exit", NULL};
+  int i = 0;
+  while (builtin_list[i] != NULL)
+  {
+    if (strcmp(builtin_list[i], cmd) == 0)
+    {
+      return 1;
+    }
+    i++;
+  }
   return 0;
 }
 
@@ -49,9 +57,47 @@ int is_builtin(const char* cmd) {
   pas reconnue.
  */
 
-int builtin(process_t* proc) {
-  assert(proc!=NULL);
-  
+int builtin(process_t *proc)
+{
+  assert(proc != NULL);
+  if (is_builtin(proc->argv[0]))
+  {
+    if (strcmp(proc->argv[0], "cd") == 0)
+    {
+      if (proc->argv[1] == NULL)
+        return -1;
+      return cd(proc->argv[1], proc->stderr);
+    }
+    else if (strcmp(proc->argv[0], "export") == 0)
+    {
+      if (strchr(proc->argv[1], '=') != NULL)
+      {
+        int position = 0;
+        char *mot;
+        char *val[2];
+
+        mot = strtok(proc->argv[1], "=");
+        val[position] = mot;
+        position++;
+
+        while (mot != NULL)
+        {
+          mot = strtok(NULL, "=");
+          val[position] = mot;
+          position = position + 1;
+        }
+        return export(val[0], val[1], proc->stderr);
+      }
+      else
+      {
+        return export(proc->argv[1], "", proc->stderr);
+      }
+    }
+    else if (strcmp(proc->argv[0], "unset") == 0)
+    {
+      return unset(proc->argv[1], proc->stderr);
+    }
+  }
   return -1;
 }
 
@@ -66,9 +112,17 @@ int builtin(process_t* proc) {
   Retourne le code de retour de l'appel système.
  */
 
-int cd(const char* path, int fderr) {
-  assert(path!=NULL);
-  
+int cd(const char *path, int fderr)
+{
+  assert(path != NULL);
+  int changed = chdir(path);
+  if (changed == 0)
+  {
+    char new_path[1024];
+    getcwd(new_path, sizeof(new_path));
+    return 0;
+  }
+  return changed;
 }
 
 /*
@@ -82,11 +136,20 @@ int cd(const char* path, int fderr) {
   Retourne le code de retour de l'appel système.
  */
 
-int export(const char* var, const char* value, int fderr) {
-  assert(var!=NULL);
-  assert(value!=NULL);
-  
-  
+int export(const char *var, const char *value, int fderr)
+{
+  assert(var != NULL);
+  assert(value != NULL);
+  int env = setenv(var, value, 1);
+  printf("%s=%s\n", var, getenv(var));
+  if (env != 0)
+  {
+    char *message = var;
+    strcat(message, " : Erreur d'exportation de variable !\n");
+    write(fderr, message, strlen(message));
+    close(fderr);
+  }
+  return env;
 }
 
 /*
@@ -99,6 +162,6 @@ int export(const char* var, const char* value, int fderr) {
   Retourne un code d'erreur en cas d'échec.
  */
 
-int exit_shell(int ret, int fdout) {
-  
+int exit_shell(int ret, int fdout)
+{
 }
