@@ -59,8 +59,7 @@ int trim(char *str)
 int clean(char *str)
 {
   assert(str != NULL);
-  int count = 0;
-  for (int i = 0; i < strlen(str); i++)
+  for (int i = 0; i < (int) strlen(str); i++)
   {
     int j = i;
     while (str[j] == ' ' || str[j] == '\t')

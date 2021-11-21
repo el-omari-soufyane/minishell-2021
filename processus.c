@@ -113,7 +113,7 @@ int launch_cmd(process_t *proc)
         if(is_builtin(proc->argv[0]) == 1) {
             int done = builtin(proc);
             if(done != 0) {
-                perror(proc->argv[1]);
+                perror(*proc->argv+1);
             }
             if(proc->next != NULL) {
                 proc = proc->next;
