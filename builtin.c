@@ -65,7 +65,7 @@ int builtin(process_t *proc)
     if (strcmp(proc->argv[0], "cd") == 0)
     {
       if (proc->argv[1] == NULL)
-        return -1;
+        return cd("~", proc->stderr);
       return cd(proc->argv[1], proc->stderr);
     }
     else if (strcmp(proc->argv[0], "export") == 0)
