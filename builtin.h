@@ -21,5 +21,6 @@ int builtin(process_t* proc);
 
 int cd(const char* path, int fderr);
 int export(const char* var, const char* value, int fderr);
+int unset(const char *var, int fderr);
 int exit_shell(int ret, int fdout);
 #endif

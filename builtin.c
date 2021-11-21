@@ -122,6 +122,13 @@ int cd(const char *path, int fderr)
     getcwd(new_path, sizeof(new_path));
     return 0;
   }
+  else
+  {
+    char *message = path;
+    strcat(message, " : Chemin invalide !\n");
+    write(fderr, message, strlen(message));
+    close(fderr);
+  }
   return changed;
 }
 
@@ -152,14 +159,16 @@ int export(const char *var, const char *value, int fderr)
   return env;
 }
 
-int unset(const char *var, int fderr) {
+int unset(const char *var, int fderr)
+{
   assert(var != NULL);
   int varUnset = unsetenv(var);
-  if(varUnset != 0) {
-      char* message = var;
-      strcat(message, " : Erreur de redéfinition de variable !\n");
-      write(fderr, message, strlen(message));
-      close(fderr);
+  if (varUnset != 0)
+  {
+    char *message = var;
+    strcat(message, " : Erreur de redéfinition de variable !\n");
+    write(fderr, message, strlen(message));
+    close(fderr);
   }
 }
 
@@ -175,4 +184,5 @@ int unset(const char *var, int fderr) {
 
 int exit_shell(int ret, int fdout)
 {
+  return ret;
 }
