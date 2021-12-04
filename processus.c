@@ -7,14 +7,14 @@
 
   Nom : CHOUKRI
   Prénom : Marouane
-  Num. étudiant : 
+  Num. étudiant : 22113416
 
   Nom : DOUMI
   Prénom : Saloua
-  Num. étudiant : 
+  Num. étudiant : 22112260
 
   Groupe de projet : 20
-  Date : 21/11/2021
+  Date : 03/12/2021
  
   Gestion des processus (implémentation).
  
@@ -79,6 +79,14 @@ int init_process(process_t *proc)
 int set_env(process_t *proc)
 {
     assert(proc != NULL);
+    /*
+        Pour remplacer une variable d'environnement
+        par sa valeur, on doit vérifier qu'elle est
+        précédée par le symbole '$'.
+        Si c'est le cas, on prend le nom de la variable
+        après le '$' et on remplace l'argument
+        par la valeur de variable d'environnement.
+    */
     int i = 0;
     while (proc->argv[i] != NULL)
     {
@@ -114,6 +122,12 @@ int set_env(process_t *proc)
 int launch_cmd(process_t *proc)
 {
     assert(proc != NULL);
+    /*
+        Les variables déclarées ci-dessous, sont des
+        variables qui dupliquent les sorties standard et
+        d'erreurs ainsi que de l'entrée standard afin que
+        chaque processus les utilise seulement à l'exécution.
+    */
     int tmp_stdin, tmp_stdout, tmp_stderr;
     do
     {
@@ -121,6 +135,16 @@ int launch_cmd(process_t *proc)
         tmp_stdout = dup(1);
         tmp_stderr = dup(2);
 
+        /*
+            On vérifie si la commande à exécutée contient des
+            variables d'environnement dans ses arguments.
+        */
+        set_env(proc);
+
+        /*
+            Si la commande est builtin, on gére
+            la prochaine commande.
+        */
         if (is_builtin(proc->argv[0]) == 1)
         {
             int done = builtin(proc);
@@ -163,19 +187,26 @@ int launch_cmd(process_t *proc)
         }
         else
         {
+            /*
+                Sinon, on crée un processus fils
+                pour exécuter la commande, et le
+                processu père va attendre le status
+                de la commande.
+            */
             proc->status = 0;
             proc->pid = fork();
             if (proc->pid == 0)
             {
                 if (proc->stdin > 0 && proc->stdout > 1)
                 {
+                    // S'il s'agit d'une commande |
                     close(proc->fdclose[0]);
                     dup2(proc->fdclose[1], 1);
                     close(proc->fdclose[1]);
                 }
                 if (proc->stdin > 0)
                 {
-                    // S'il s'agit d'une commande > ou >>
+                    // S'il s'agit d'une commande <
                     dup2(proc->stdin, 0);
                     close(proc->stdin);
                 }
@@ -205,7 +236,7 @@ int launch_cmd(process_t *proc)
                     close(proc->fdclose[0]);
                     proc++;
                     execvp(*proc->argv, proc->argv);
-                    perror("pipe");
+                    perror("pipe error");
                     exit(1);
                 }
                 wait(&proc->status);
@@ -221,7 +252,7 @@ int launch_cmd(process_t *proc)
                 {
                     close(proc->stderr);
                 }
-                // Revenir à l'état standard des sorties standard et erreurs
+                // Revenir à l'état standard des sorties standard et d'erreurs
                 dup2(tmp_stdin, 0);
                 close(tmp_stdin);
                 dup2(tmp_stdout, 1);
@@ -229,12 +260,14 @@ int launch_cmd(process_t *proc)
                 dup2(tmp_stderr, 2);
                 close(tmp_stderr);
 
+                // S'il s'agit d'une commande ;
                 if (proc->next != NULL)
                 {
                     proc = proc->next;
                     continue;
                 }
 
+                // S'il s'agit d'une commande &&
                 if (proc->next_success != NULL)
                 {
                     if (proc->status == 0)
@@ -248,6 +281,7 @@ int launch_cmd(process_t *proc)
                     }
                 }
 
+                // S'il s'agit d'une commande ||
                 if (proc->next_failure != NULL)
                 {
                     if (proc->status != 0)

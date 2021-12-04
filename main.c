@@ -7,14 +7,14 @@
 
   Nom : CHOUKRI
   Prénom : Marouane
-  Num. étudiant : 
+  Num. étudiant : 22113416
 
   Nom : DOUMI
   Prénom : Saloua
-  Num. étudiant : 
+  Num. étudiant : 22112260
 
   Groupe de projet : 20
-  Date : 21/11/2021
+  Date : 03/12/2021
  
   Parsing de la ligne de commandes utilisateur (implémentation).
  
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     // "Nettoyage" de la ligne de commandes
     trim(line);
     clean(line);
-    // D�coupage en "tokens"
+    // Découpage en "tokens"
     tokenize(line, cmdline);
 
     // Parsing de la ligne pour remplir les structures
@@ -64,10 +64,9 @@ int main(int argc, char *argv[])
     parse_cmd(cmdline, cmds);
 
     // Lancement des commandes dans l'ordre attendu,
-    // avec les �ventuelles redirections et conditionnements
-    // d'ex�cution.
+    // avec les éventuelles redirections et conditionnements
+    // d'exécution.
     launch_cmd(cmds);
-    //toString(cmds); break;
   }
   return -1;
 }
